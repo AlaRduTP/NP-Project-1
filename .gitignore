@@ -8,3 +8,6 @@ npshell
 bin/*
 !bin/*.cpp
 !bin/Makefile
+
+# Object files
+*.o
