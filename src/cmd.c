@@ -38,28 +38,30 @@ void cmd_del(struct Cmd * cmd) {
     free(cmd);
 }
 
-static inline void _cmd_set_io(int fd[2], size_t src, int des) {
+static inline void _cmd_set_io(int fd[2], size_t src, int des, int cls) {
     dup2(fd[src], des);
-    close(fd[0]);
-    close(fd[1]);
-}
-
-static inline void _cmd_set_in(struct Pipe * ip, int des) {
-    if(ip) {
-        _cmd_set_io(ip->fd, 0, des);
+    if(cls) {
+        close(fd[0]);
+        close(fd[1]);
     }
 }
 
-static inline void _cmd_set_out(struct Pipe * op, int des) {
+static inline void _cmd_set_in(struct Pipe * ip, int des, int cls) {
+    if(ip) {
+        _cmd_set_io(ip->fd, 0, des, cls);
+    }
+}
+
+static inline void _cmd_set_out(struct Pipe * op, int des, int cls) {
     if(op) {
-        _cmd_set_io(op->fd, 1, des);
+        _cmd_set_io(op->fd, 1, des, cls);
     }
 }
 
 void cmd_set_io(struct Cmd * cmd) {
-    _cmd_set_in(cmd->pipes[0], STDIN_FILENO);
-    _cmd_set_out(cmd->pipes[1], STDOUT_FILENO);
-    _cmd_set_out(cmd->pipes[2], STDERR_FILENO);
+    _cmd_set_in(cmd->pipes[0], STDIN_FILENO, 1);
+    _cmd_set_out(cmd->pipes[1], STDOUT_FILENO, cmd->pipes[1] != cmd->pipes[2]);
+    _cmd_set_out(cmd->pipes[2], STDERR_FILENO, 1);
 }
 
 struct CmdList * cmd_list_new() {
