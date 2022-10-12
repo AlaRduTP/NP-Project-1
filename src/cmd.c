@@ -81,11 +81,12 @@ void cmd_list_del(struct CmdList * list) {
 }
 
 void cmd_list_setline(struct CmdList * list, char * line) {
-    free(list->line);
+    char * old = list->line;
     list->line = NULL;
     if(line) {
         list->line = strdup(line);
     }
+    free(old);
 }
 
 struct Cmd * cmd_list_next(struct CmdList * list) {
