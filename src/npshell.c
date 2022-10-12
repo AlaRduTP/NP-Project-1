@@ -75,6 +75,8 @@ static void _npshell_exec(struct Cmd * cmd) {
         cmd->caller(cmd->argv0, cmd->argv);
 
         // TBD: exec failed
+        fprintf(stderr, "Unknown command: [%s]\n", cmd->argv0);
+        _exit(EXIT_FAILURE);
 
     } else {
         /* parent */
