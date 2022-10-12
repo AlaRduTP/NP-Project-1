@@ -17,16 +17,9 @@ static void _npshell_init(struct NPShell ** shell) {
     struct sigaction act = {
         .sa_flags = SA_NOCLDSTOP | SA_SIGINFO | SA_NOCLDWAIT
     };
-    sigaction(SIGCHLD, &act, NULL);
-
-    char * cwd = get_current_dir_name();
-    char * PATH = NULL;
     
-    asprintf(&PATH, "%s/bin", cwd);
-    setenv("PATH", PATH, 1);
-
-    free(PATH);
-    free(cwd);
+    sigaction(SIGCHLD, &act, NULL);
+    setenv("PATH", "bin", 1);
 
     *shell = malloc(sizeof(struct NPShell));
     (*shell)->cmds = cmd_list_new();
