@@ -86,10 +86,6 @@ void cmd_list_setline(struct CmdList * list, char * line) {
     }
 }
 
-static void _cmd_set_pipe(struct Cmd * cmd, size_t id, int np) {
-
-}
-
 struct Cmd * cmd_list_next(struct CmdList * list) {
     int num_pipe = 0;
     char * cmd_str = NULL;
