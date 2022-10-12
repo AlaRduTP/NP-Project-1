@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#define _DEFAULT_SOURCE
 
 #include "parser.h"
 #include "utils.h"
@@ -52,10 +53,16 @@ char * parser_line(char * line, int * num_pipe, char ** next) {
 char ** parser_cmd(char * cmd_str) {
     char ** argv = NULL;
     size_t argc = 0;
-    for(char a[300]; sscanf(cmd_str, "%s", a) > 0; ++argc) {
+
+    while(cmd_str) {
+        while(*cmd_str == ' ') {
+            ++cmd_str;
+        }
+        char * tok = strsep(&cmd_str, " ");
         argv = realloc(argv, (argc + 1) * sizeof(char *));
-        argv[argc] = strdup(a);
+        argv[argc++] = strdup(tok);
     }
+
     argv = realloc(argv, (argc + 1) * sizeof(char *));
     argv[argc] = NULL;
     return argv;

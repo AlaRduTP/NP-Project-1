@@ -25,7 +25,7 @@ struct PipeList * pipe_list_new() {
     struct PipeList * list = malloc(sizeof(struct PipeList));
     for(size_t i = 0; i < NPS_PLSIZE; ++i) {
         list->head[i].next = list->head + i;
-        list->head[i].prev = list->head[i].next;
+        list->head[i].prev = list->head + i;
     }
     return list;
 }
@@ -41,13 +41,14 @@ void pipe_list_del(struct PipeList * list) {
 }
 
 struct Pipe * pipe_list_find(struct PipeList * list, const size_t id) {
-    struct Pipe * pp = list->head + id % NPS_PLSIZE;
-    for(pp = pp->next; pp; pp = pp->next) {
+    struct Pipe * head = list->head + id % NPS_PLSIZE;
+    struct Pipe * pp = NULL;
+    for(pp = head->next; pp != head; pp = pp->next) {
         if(pp->id == id) {
             break;
         }
     }
-    return pp;
+    return pp == head ? NULL : pp;
 }
 
 static struct Pipe * _pipe_list_add(struct PipeList * list, const size_t id) {
@@ -69,7 +70,9 @@ struct Pipe * pipe_list_get(struct PipeList * list, const size_t id) {
 }
 
 void pipe_list_remove(struct Pipe * pp) {
-    pp->prev->next = pp->next;
-    pp->next->prev = pp->prev;
+    if(pp) {
+        pp->prev->next = pp->next;
+        pp->next->prev = pp->prev;
+    }
     pipe_del(pp);
 }
