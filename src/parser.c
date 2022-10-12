@@ -58,6 +58,9 @@ char ** parser_cmd(char * cmd_str) {
         while(*cmd_str == ' ') {
             ++cmd_str;
         }
+        if(!*cmd_str) {
+            break;
+        }
         char * tok = strsep(&cmd_str, " ");
         argv = realloc(argv, (argc + 1) * sizeof(char *));
         argv[argc++] = strdup(tok);
