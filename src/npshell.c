@@ -46,7 +46,6 @@ void npshell_del(struct NPShell * shell) {
 }
 
 ssize_t npshell_getline(struct NPShell * shell) {
-    while(wait(NULL) > 0) { /* nop */ }
     write(STDOUT_FILENO, "% ", 2);
 
     char * line = NULL;
@@ -92,8 +91,11 @@ static void _npshell_exec(struct Cmd * cmd) {
 
 void npshell_exec(struct NPShell * shell) {
     struct Cmd * cmd;
+    int block = 0;
     while(cmd = cmd_list_next(shell->cmds)) {
+        block = cmd->pipes[1] == NULL;
         _npshell_exec(cmd);
         cmd_list_remove(cmd);
     }
+    while(block && wait(NULL) > 0) { /* nop */ }
 }
