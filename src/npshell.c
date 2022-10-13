@@ -21,7 +21,7 @@ static void _npshell_init(struct NPShell ** shell) {
     };
     
     sigaction(SIGCHLD, &act, NULL);
-    setenv("PATH", "bin", 1);
+    setenv("PATH", "bin:.", 1);
 
     *shell = malloc(sizeof(struct NPShell));
     (*shell)->cmds = cmd_list_new();
@@ -80,7 +80,7 @@ static void _npshell_exec(struct Cmd * cmd) {
         cmd->caller(cmd->argv0, cmd->argv);
 
         if(errno == ENOENT) {
-            fprintf(stderr, "Unknown command: [%s]\n", cmd->argv0);
+            fprintf(stderr, "Unknown command: [%s].\n", cmd->argv0);
         } else {
             perror(cmd->argv0);
         }
