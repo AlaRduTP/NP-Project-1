@@ -44,7 +44,8 @@ int nps_printenv(const char * self, char * const * args) {
 
 void nps_exit_real(char * const * args) {
     /* Kill all child processes if they do not change process group ID. */
-    kill(0, SIGINT);
+    /* Maybe we can just exit? */
+    // kill(0, SIGINT);
     exit(EXIT_SUCCESS);
 }
 
