@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static size_t _nps_args_count(char * const * args) {
+size_t nps_args_count(char * const * args) {
     size_t count = 0;
     while(args[count]) {
         ++count;
@@ -17,13 +17,13 @@ static size_t _nps_args_count(char * const * args) {
 }
 
 void nps_setenv_real(char * const * args) {
-    if(_nps_args_count(args) == 3) {
+    if(nps_args_count(args) == 3) {
         setenv(args[1], args[2], 1);
     }
 }
 
 int nps_setenv(const char * self, char * const * args) {
-    if(_nps_args_count(args) != 3) {
+    if(nps_args_count(args) != 3) {
         fputs("usage: setenv NAME VALUE\n", stderr);
         exit(EXIT_FAILURE);
     }
@@ -31,7 +31,7 @@ int nps_setenv(const char * self, char * const * args) {
 }
 
 int nps_printenv(const char * self, char * const * args) {
-    if(_nps_args_count(args) != 2) {
+    if(nps_args_count(args) != 2) {
         fputs("usage: printenv NAME\n", stderr);
         exit(EXIT_FAILURE);
     }

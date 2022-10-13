@@ -4,12 +4,16 @@
 #include "parser.h"
 #include "utils.h"
 
+#include <fcntl.h>
 #include <limits.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#define NPS_O_FLAG (O_CREAT | O_WRONLY | O_TRUNC)
+#define NPS_O_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 
 char * parser_line(char * line, int * num_pipe, char ** next) {
     *num_pipe = 0;
@@ -69,6 +73,29 @@ char ** parser_cmd(char * cmd_str) {
     argv = realloc(argv, (argc + 1) * sizeof(char *));
     argv[argc] = NULL;
     return argv;
+}
+
+int parse_redir(char *** argv) {
+    size_t argc = nps_args_count(*argv);
+    if(argc < 3 || strcmp((*argv)[argc - 2], ">")) {
+        return -1;
+    }
+
+    int fd = open((*argv)[argc - 1], NPS_O_FLAG, NPS_O_MODE);
+
+    size_t new_argc = argc - 2;
+    char ** new_argv = malloc((new_argc + 1) * sizeof(char *));
+
+    for(size_t i = 0; i < new_argc; ++i) {
+        new_argv[i] = (*argv)[i];
+    }
+    new_argv[new_argc] = NULL;
+
+    free((*argv)[argc - 2]);
+    free((*argv)[argc - 1]);
+
+    *argv = new_argv;
+    return fd;
 }
 
 int (* parser_caller(char * caller_str))(const char *, char * const *) {

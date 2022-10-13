@@ -22,6 +22,7 @@ struct Cmd {
     char ** argv;
 
     struct Pipe * pipes[3];
+    int redir[3];
 };
 
 struct CmdList {

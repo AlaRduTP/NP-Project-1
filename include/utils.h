@@ -1,6 +1,10 @@
 #ifndef NPSHELL_UTILS
 #define NPSHELL_UTILS
 
+#include <stddef.h>
+
+size_t nps_args_count(char * const * args);
+
 void nps_setenv_real(char * const * args);
 void nps_exit_real(char * const * args);
 

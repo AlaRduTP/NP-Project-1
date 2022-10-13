@@ -23,6 +23,10 @@ struct Cmd * cmd_new(int (* caller)(const char *, char * const *), char ** argv)
     cmd->pipes[1] = NULL;
     cmd->pipes[2] = NULL;
 
+    cmd->redir[0] = -1;
+    cmd->redir[1] = -1;
+    cmd->redir[2] = -1;
+
     return cmd;
 }
 
@@ -35,6 +39,12 @@ void cmd_del(struct Cmd * cmd) {
             free(*v);
         }
         free(cmd->argv);
+
+        for(size_t i = 0; i < 3; ++i) {
+            if(cmd->redir[i] >= 0) {
+                close(cmd->redir[i]);
+            }
+        }
     }
     free(cmd);
 }
@@ -59,10 +69,21 @@ static inline void _cmd_set_out(struct Pipe * op, int des, int cls) {
     }
 }
 
+static inline void _cmd_set_redir(int redir[3]) {
+    const int STDFNO[3] = {STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO};
+    for(size_t i = 0; i < 3; ++i) {
+        if(redir[i] >= 0) {
+            dup2(redir[i], STDFNO[i]);
+            close(redir[i]);
+        }
+    }
+}
+
 void cmd_set_io(struct Cmd * cmd) {
     _cmd_set_in(cmd->pipes[0], STDIN_FILENO, 1);
     _cmd_set_out(cmd->pipes[1], STDOUT_FILENO, cmd->pipes[1] != cmd->pipes[2]);
     _cmd_set_out(cmd->pipes[2], STDERR_FILENO, 1);
+    _cmd_set_redir(cmd->redir);
 }
 
 struct CmdList * cmd_list_new() {
@@ -105,6 +126,8 @@ struct Cmd * cmd_list_next(struct CmdList * list) {
     char ** argv = parser_cmd(cmd_str);
     free(cmd_str);
 
+    int redir = parse_redir(&argv);
+
     int (* caller)(const char *, char * const *) = parser_caller(argv[0]);
     struct Cmd * cmd = cmd_new(caller, argv);
 
@@ -114,6 +137,10 @@ struct Cmd * cmd_list_next(struct CmdList * list) {
     }
     if(num_pipe < 0) {
         cmd->pipes[2] = cmd->pipes[1];
+    }
+
+    if(!num_pipe) {
+        cmd->redir[1] = redir;
     }
 
     ++list->cc;
