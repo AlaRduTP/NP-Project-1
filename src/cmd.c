@@ -131,19 +131,27 @@ struct Cmd * cmd_list_next(struct CmdList * list) {
     int (* caller)(const char *, char * const *) = parser_caller(argv[0]);
     struct Cmd * cmd = cmd_new(caller, argv);
 
-    cmd->pipes[0] = pipe_list_find(list->pipes, list->cc);
-    if(num_pipe) {
-        cmd->pipes[1] = pipe_list_get(list->pipes, list->cc + (num_pipe & INT_MAX));
+    /* ordinary pipe */
+    cmd->pipes[0] = pipe_list_find(list->pipes, 0);
+    if(!cmd->pipes[0]) {
+        /* numbered pipe */
+        cmd->pipes[0] = pipe_list_find(list->pipes, list->cc);
     }
-    if(num_pipe < 0) {
-        cmd->pipes[2] = cmd->pipes[1];
+
+    if(num_pipe == NPS_ORDPP) {
+        cmd->pipes[1] = pipe_list_get(list->pipes, 0);
+    } else if(num_pipe) {
+        cmd->pipes[1] = pipe_list_get(list->pipes, list->cc + (num_pipe & INT_MAX));
+        if(num_pipe < 0) {
+            cmd->pipes[2] = cmd->pipes[1];
+        }
     }
 
     if(!num_pipe) {
         cmd->redir[1] = redir;
     }
 
-    ++list->cc;
+    list->cc += num_pipe != NPS_ORDPP;
     cmd_list_setline(list, next);
 
     return cmd;

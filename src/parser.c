@@ -30,12 +30,12 @@ char * parser_line(char * line, int * num_pipe, char ** next) {
     
     if(pp) {
         if(pp == line) {
-            *num_pipe = -1;
+            *num_pipe = NPS_INVPP;
             return NULL;
         }
 
         if(pp[1] < '0' || pp[1] > '9') {
-            *num_pipe = 1;
+            *num_pipe = NPS_ORDPP;
         } else {
             sscanf(pp + 1, "%d", num_pipe);
         }
