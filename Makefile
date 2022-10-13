@@ -1,5 +1,5 @@
-# CFLAGS := -std=c99 -O3
-CFLAGS := -g -O0 -Q -Werror
+CFLAGS := -std=c99 -O3 -Werror
+# CFLAGS := -g -O0 -Q -Werror
 CINCLUDE := -I ./include
 
 TARGETS := cmd main npshell parser pipe utils
