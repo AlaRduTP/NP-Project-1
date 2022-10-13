@@ -131,9 +131,11 @@ struct Cmd * cmd_list_next(struct CmdList * list) {
     int (* caller)(const char *, char * const *) = parser_caller(argv[0]);
     struct Cmd * cmd = cmd_new(caller, argv);
 
-    /* ordinary pipe */
     cmd->pipes[0] = pipe_list_find(list->pipes, 0);
-    if(!cmd->pipes[0]) {
+    if(cmd->pipes[0]) {
+        /* ordinary pipe */
+        cmd->pipes[0]->id = -1;
+    } else {
         /* numbered pipe */
         cmd->pipes[0] = pipe_list_find(list->pipes, list->cc);
     }
