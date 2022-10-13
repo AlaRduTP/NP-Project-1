@@ -86,3 +86,13 @@ int (* parser_caller(char * caller_str))(const char *, char * const *) {
 
     return caller;
 }
+
+void (* parser_bfrcall(int (* caller)(const char *, char * const *)))(char * const *) {
+    void (* bfrcall)(char * const *) = NULL;
+
+    if(caller == nps_setenv) {
+        bfrcall = nps_setenv_real;
+    }
+
+    return bfrcall;
+}

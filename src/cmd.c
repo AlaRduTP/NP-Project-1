@@ -14,6 +14,7 @@ struct Cmd * cmd_new(int (* caller)(const char *, char * const *), char ** argv)
     struct Cmd * cmd = malloc(sizeof(struct Cmd));
 
     cmd->caller = caller;
+    cmd->bfrcall = parser_bfrcall(caller);
 
     cmd->argv0 = argv[0];
     cmd->argv = argv;

@@ -62,6 +62,10 @@ ssize_t npshell_getline(struct NPShell * shell) {
 }
 
 static void _npshell_exec(struct Cmd * cmd) {
+    if(cmd->bfrcall) {
+        cmd->bfrcall(cmd->argv);
+    }
+
     pid_t pid;
     while((pid = fork()) == -1) {
 
@@ -74,10 +78,8 @@ static void _npshell_exec(struct Cmd * cmd) {
         cmd_set_io(cmd);
         cmd->caller(cmd->argv0, cmd->argv);
 
-        // TBD: exec failed
         fprintf(stderr, "Unknown command: [%s]\n", cmd->argv0);
         _exit(EXIT_FAILURE);
-
     } else {
         /* parent */
     }

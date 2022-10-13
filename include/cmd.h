@@ -13,6 +13,11 @@ struct Cmd {
      */
     int (* caller)(const char *, char * const *);
 
+    /* * *
+     * bfrcall() should be called before caller() if it is not NULL.
+     */
+    void (* bfrcall)(char * const *);
+
     char * argv0;
     char ** argv;
 
