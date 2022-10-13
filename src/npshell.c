@@ -4,14 +4,16 @@
 #include "cmd.h"
 #include "npshell.h"
 
+#include <errno.h>
 #include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+extern int errno;
 
 static void _npshell_init(struct NPShell ** shell) {
     struct sigaction act = {
@@ -74,11 +76,14 @@ static void _npshell_exec(struct Cmd * cmd) {
     }
     if(pid == 0) {
         /* child */
-        prctl(PR_SET_PDEATHSIG, SIGINT);
         cmd_set_io(cmd);
         cmd->caller(cmd->argv0, cmd->argv);
 
-        fprintf(stderr, "Unknown command: [%s]\n", cmd->argv0);
+        if(errno == ENOENT) {
+            fprintf(stderr, "Unknown command: [%s]\n", cmd->argv0);
+        } else {
+            perror(cmd->argv0);
+        }
         _exit(EXIT_FAILURE);
     } else {
         /* parent */

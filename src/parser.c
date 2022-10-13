@@ -93,6 +93,9 @@ void (* parser_bfrcall(int (* caller)(const char *, char * const *)))(char * con
     if(caller == nps_setenv) {
         bfrcall = nps_setenv_real;
     }
+    if(caller == nps_exit) {
+        bfrcall = nps_exit_real;
+    }
 
     return bfrcall;
 }

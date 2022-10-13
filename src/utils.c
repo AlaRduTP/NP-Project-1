@@ -42,6 +42,14 @@ int nps_printenv(const char * self, char * const * args) {
     exit(EXIT_SUCCESS);
 }
 
+void nps_exit_real(char * const * args) {
+    /* Kill all child processes if they do not change process group ID. */
+    kill(0, SIGINT);
+    exit(EXIT_SUCCESS);
+}
+
 int nps_exit(const char * self, char * const * args) {
-    kill(getppid(), SIGINT);
+    /* This should not happen */
+    fputs("exit: why are you alive?\n", stderr);
+    exit(EXIT_FAILURE);
 }
